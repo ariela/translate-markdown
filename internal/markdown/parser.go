@@ -53,23 +53,26 @@ func (p *Parser) Parse(source []byte) ([]Segment, error) {
 			return ast.WalkContinue, nil
 		}
 
-		// ast.Textノードにキャスト
 		textNode := n.(*ast.Text)
 		start := textNode.Segment.Start
 		stop := textNode.Segment.Stop
 
-		// 親ノードをチェックして、コードブロック内かどうかを判断
+		// --- SPEC CHANGE START ---
+		// 親ノードをチェックして、FencedCodeBlock(```...```)の中かどうかを判断
 		isTranslatable := true
 		parent := n.Parent()
 		if parent != nil {
 			pKind := parent.Kind()
-			if pKind == ast.KindCodeSpan || pKind == ast.KindFencedCodeBlock {
+			// FencedCodeBlockの中のテキストのみを翻訳対象外とする
+			// これにより、CodeSpan( `...` )の中のテキストは翻訳対象となる
+			if pKind == ast.KindFencedCodeBlock {
 				isTranslatable = false
 			}
 		}
 		if textNode.IsRaw() {
 			isTranslatable = false
 		}
+		// --- SPEC CHANGE END ---
 
 		if start < lastPos {
 			return ast.WalkContinue, nil
