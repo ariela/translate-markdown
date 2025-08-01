@@ -1,5 +1,7 @@
 # .goreleaser.yml
 # このファイルはGoReleaserの設定を定義します
+
+# GoReleaser v2を使用することを明記
 version: 2
 
 # プロジェクト名を指定
@@ -11,36 +13,47 @@ before:
     - go mod tidy
 
 builds:
-  # ビルド設定のリスト（今回は1つだけ）
-  -
-    # mainパッケージのパス
+  # macOSとLinux向けのビルド設定
+  - id: nix
     main: ./cmd/translate-markdown/
-    # CGOを無効にして、クロスコンパイルを容易にする
     env:
       - CGO_ENABLED=0
-    # ビルド対象のOSとアーキテクチャ
     goos:
       - linux
-      - windows
-      - darwin # macOS
+      - darwin
     goarch:
       - amd64
       - arm64
-    # バイナリを小さくするためのフラグ
+    ldflags:
+      - -s -w
+  # Windows向けのビルド設定
+  - id: windows
+    main: ./cmd/translate-markdown/
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - windows
+    goarch:
+      - amd64
+      - arm64
     ldflags:
       - -s -w
 
 archives:
-  # ビルドしたバイナリをどのようにアーカイブ（圧縮）するかの設定
-  -
-    # アーカイブファイル名のテンプレート
-    # 例: translate-markdown_1.0.0_windows_amd64.zip
+  # macOSとLinux向けのtar.gzアーカイブ設定
+  - id: nix
+    formats: [ 'tar.gz' ]
+    ids:
+      - nix
     name_template: >-
       {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}
-    # Windows向けにはzip、その他はtar.gzで圧縮
-    format_overrides:
-      - goos: windows
-        formats: [ 'zip' ]
+  # Windows向けのzipアーカイブ設定
+  - id: windows
+    formats: [ 'zip' ]
+    ids:
+      - windows
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}
 
 # リリース後の成果物のチェックサムを計算
 checksum:
@@ -48,7 +61,7 @@ checksum:
 
 # スナップショット（開発版）リリースの設定
 snapshot:
-  version_template: "{{ incpatch .Version }}-next"
+# name_templateは非推奨のため削除。GoReleaserのデフォルトを使用します。
 
 # CHANGELOGの自動生成設定
 changelog:
