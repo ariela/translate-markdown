@@ -97,8 +97,6 @@ func (c *Client) Translate(texts []string, targetLang string) ([]string, error) 
 		}
 
 		if resp.StatusCode == http.StatusOK {
-			// --- BUG FIX START ---
-			// 成功時のレスポンスボディをデコード
 			var translateResp TranslateResponse
 			if err := json.NewDecoder(resp.Body).Decode(&translateResp); err != nil {
 				resp.Body.Close()
@@ -106,16 +104,18 @@ func (c *Client) Translate(texts []string, targetLang string) ([]string, error) 
 			}
 			resp.Body.Close()
 
-			// 翻訳済みテキストを抽出して返す
 			var translatedTexts []string
 			for _, t := range translateResp.Translations {
 				translatedTexts = append(translatedTexts, t.Text)
 			}
 			return translatedTexts, nil
-			// --- BUG FIX END ---
 		}
 
-		body, _ := io.ReadAll(resp.Body)
+		body, readErr := io.ReadAll(resp.Body)
+		if readErr != nil {
+			resp.Body.Close()
+			return nil, fmt.Errorf("failed to read error response body: %w", readErr)
+		}
 		resp.Body.Close()
 		c.logger.Debug("Received DeepL API error response", "status", resp.Status, "body", string(body))
 

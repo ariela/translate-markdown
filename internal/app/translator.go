@@ -81,7 +81,7 @@ func (t *Translator) TranslateJob(job Job, cfg *Config) error {
 // translateDirectoryはディレクトリ内の全てのMarkdownファイルを再帰的に翻訳します。
 func (t *Translator) translateDirectory(job Job, targetLang string) error {
 	var tasks []translationTask
-	err := filepath.WalkDir(job.Source, func(path string, d fs.DirEntry, err error) error {
+	walkErr := filepath.WalkDir(job.Source, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			t.Report.AddError(path, err)
 			return nil
@@ -92,9 +92,9 @@ func (t *Translator) translateDirectory(job Job, targetLang string) error {
 
 		// 除外チェック
 		for _, pattern := range job.Exclude {
-			match, err := doublestar.Match(pattern, path)
-			if err != nil {
-				t.Report.AddError(path, fmt.Errorf("invalid exclude pattern: %w", err))
+			match, matchErr := doublestar.Match(pattern, path)
+			if matchErr != nil {
+				t.Report.AddError(path, fmt.Errorf("invalid exclude pattern: %w", matchErr))
 				return nil
 			}
 			if match {
@@ -104,15 +104,15 @@ func (t *Translator) translateDirectory(job Job, targetLang string) error {
 			}
 		}
 
-		relPath, err := filepath.Rel(job.Source, path)
-		if err != nil {
-			t.Report.AddError(path, err)
+		relPath, relErr := filepath.Rel(job.Source, path)
+		if relErr != nil {
+			t.Report.AddError(path, relErr)
 			return nil
 		}
 		destPath := filepath.Join(job.Destination, relPath)
 
-		if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
-			t.Report.AddError(path, err)
+		if mkdirErr := os.MkdirAll(filepath.Dir(destPath), 0755); mkdirErr != nil {
+			t.Report.AddError(path, mkdirErr)
 			return nil
 		}
 
@@ -124,8 +124,8 @@ func (t *Translator) translateDirectory(job Job, targetLang string) error {
 		return nil
 	})
 
-	if err != nil {
-		return err
+	if walkErr != nil {
+		return walkErr
 	}
 
 	t.runWorkers(tasks)
@@ -200,7 +200,8 @@ func (t *Translator) translateFile(sourcePath, destPath, targetLang string) erro
 
 	if len(textsToTranslate) == 0 {
 		fmt.Printf("No translatable text found in %s, copying file.\n", sourcePath)
-		if err := os.WriteFile(destPath, sourceContent, 0644); err != nil {
+		err = os.WriteFile(destPath, sourceContent, 0644)
+		if err != nil {
 			return err
 		}
 		t.cache.Update(sourcePath, hash)
