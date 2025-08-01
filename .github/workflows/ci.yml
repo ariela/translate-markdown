@@ -57,7 +57,7 @@ jobs:
 
       # GoReleaserを実行して、クロスコンパイルとGitHubリリースの作成を自動化
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6 # BUG FIX: 最新のv6系に更新
         with:
           # '--clean' はリリース前に過去の成果物を削除するオプション
           args: release --clean
