@@ -21,7 +21,7 @@ linters-settings:
     simplify: true
   goimports:
     # goimports と同じく、import文を整理します。
-    local-prefixes: github.com/your-username/translate-markdown
+    local-prefixes: github.com/ariela/translate-markdown
   stylecheck:
     # ST1000: パッケージコメントの欠落をチェックします。
     checks: ["all", "-ST1000"]

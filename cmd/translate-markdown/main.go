@@ -9,9 +9,10 @@ import (
 	"runtime"
 
 	"github.com/spf13/cobra"
-	"github.com/your-username/translate-markdown/internal/app"
-	"github.com/your-username/translate-markdown/internal/deepl"
-	"github.com/your-username/translate-markdown/internal/logging"
+
+	"github.com/ariela/translate-markdown/internal/app"
+	"github.com/ariela/translate-markdown/internal/deepl"
+	"github.com/ariela/translate-markdown/internal/logging"
 )
 
 var (

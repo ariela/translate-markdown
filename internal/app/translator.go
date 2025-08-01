@@ -10,8 +10,9 @@ import (
 	"unicode/utf8"
 
 	"github.com/bmatcuk/doublestar/v4"
-	"github.com/your-username/translate-markdown/internal/deepl"
-	"github.com/your-username/translate-markdown/internal/markdown"
+
+	"github.com/ariela/translate-markdown/internal/deepl"
+	"github.com/ariela/translate-markdown/internal/markdown"
 )
 
 // Translatorは翻訳処理のコアロジックを管理します。

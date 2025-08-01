@@ -23,7 +23,7 @@ DeepL APIを使用して、Markdownファイルの構造を維持したまま翻
 ## 使い方
 
 1.  **バイナリのダウンロード**
-    [GitHub Releasesページ](https://github.com/your-username/translate-markdown/releases)から、お使いのOSに合った最新のファイルをダウンロードしてください。
+    [GitHub Releasesページ](https://github.com/ariela/translate-markdown/releases)から、お使いのOSに合った最新のファイルをダウンロードしてください。
 
 2.  **APIキーの設定**
     DeepL APIキーを環境変数に設定します。
@@ -60,13 +60,13 @@ DeepL APIを使用して、Markdownファイルの構造を維持したまま翻
     brew install mise
 
     # または、以下のスクリプトでインストール
-    curl [https://mise.run](https://mise.run) | sh
+    curl https://mise.run | sh
     ```
     インストール後、シェル設定を更新するのを忘れないでください。
 
 2.  **リポジトリのクローン**
     ```sh
-    git clone [https://github.com/your-username/translate-markdown.git](https://github.com/your-username/translate-markdown.git)
+    git clone https://github.com/ariela/translate-markdown.git
     cd translate-markdown
     ```
 
@@ -79,7 +79,7 @@ DeepL APIを使用して、Markdownファイルの構造を維持したまま翻
 4.  **(任意) golangci-lintのインストール**
     コードの静的解析（Lint）を行う場合は、`golangci-lint` をインストールします。
     ```sh
-    go install [github.com/golangci/golangci-lint/cmd/golangci-lint@latest](https://github.com/golangci/golangci-lint/cmd/golangci-lint@latest)
+    go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     ```
 
 ### よく使うコマンド (Common Commands)

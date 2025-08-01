@@ -1,4 +1,4 @@
-module github.com/your-username/translate-markdown
+module github.com/ariela/translate-markdown
 
 go 1.24
 
