@@ -230,6 +230,9 @@ config.toml
 # Testing Output
 docs/en/
 
+# Testing Binaries
+dist/
+
 # Translation cache
 .translation_cache.json
 
