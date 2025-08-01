@@ -1,0 +1,66 @@
+# .github/workflows/ci.yml
+name: Go CI and Release
+
+# ワークフローが実行されるトリガーを定義
+on:
+  push:
+    branches: [ "main" ]
+    # vから始まるタグ（例: v1.0.0, v1.2.3）がプッシュされた時にも実行
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # 'build'ジョブを'test'に改名し、責務を明確化
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+      - name: Install dependencies
+        run: go mod download
+      - name: Build
+        run: go build -v ./...
+      - name: Check formatting
+        run: |
+          if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+            echo "Code is not formatted. Please run 'gofmt -s -w .'"
+            exit 1
+          fi
+      - name: Run linter
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.59
+      - name: Run tests
+        run: go test -v ./...
+
+  # リリースを作成するための新しいジョブ
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    # testジョブが成功した場合のみ、かつタグがプッシュされた時のみ実行
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      # GoReleaserを実行して、クロスコンパイルとGitHubリリースの作成を自動化
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          # '--clean' はリリース前に過去の成果物を削除するオプション
+          args: release --clean
+        env:
+          # GITHUB_TOKENはGitHub Actionsが自動的に提供してくれます
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

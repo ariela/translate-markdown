@@ -1,0 +1,21 @@
+# 翻訳先の言語 (例: "EN-US", "DE", "FR")。
+# この項目は必須です。
+target_lang = "EN-US"
+
+# 翻訳元の言語。
+# 省略した場合、DeepLが言語を自動で検出します。
+source_lang = "JA"
+
+# --- ジョブ1: 単一ファイルの翻訳 ---
+[[jobs]]
+source = "examples/source.md"
+destination = "examples/translated.md"
+
+# --- ジョブ2: ディレクトリの一括翻訳 ---
+# このジョブだけ翻訳先言語を上書き
+[[jobs]]
+source = "docs/jp/"
+destination = "docs/en/"
+target_lang = "EN-US"
+# "drafts"ディレクトリ配下のファイルを除外
+exclude = ["**/drafts/*"]

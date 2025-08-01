@@ -1,0 +1,53 @@
+# .golangci.yml
+# golangci-lint の設定ファイル
+
+run:
+  # デフォルトのタイムアウトは1分。必要に応じて延長します。
+  timeout: 3m
+  # go test -v ./... のように、テストを含む全てのパッケージを対象とします。
+  tests: true
+
+linters-settings:
+  errcheck:
+    # io.Close のような、チェックが漏れがちなエラーを検査します。
+    check-type-assertions: true
+    check-blank: true
+  govet:
+    # シャドーイングされた変数を検出します。
+    check-shadowing: true
+  gofmt:
+    # gofmt -s と同じく、コードをシンプルにする提案をします。
+    simplify: true
+  goimports:
+    # goimports と同じく、import文を整理します。
+    local-prefixes: github.com/your-username/translate-markdown
+  stylecheck:
+    # ST1000: パッケージコメントの欠落をチェックします。
+    checks: ["all", "-ST1000"]
+
+linters:
+  # デフォルトのリンターセットを無効にし、明示的に指定します。
+  disable-all: true
+  enable:
+    # --- 推奨リンターセット ---
+    - errcheck      # 未チェックのエラーを検出
+    - govet         # 標準的な問題を検出 (go vet)
+    - staticcheck   # 高度な静的解析
+    - unused        # 未使用のコードを検出
+    - ineffassign   # 効果のない代入を検出
+    - typecheck     # 型チェック
+    - gofmt         # フォーマットの問題を検出
+    - goimports     # import文の順序をチェック
+    - misspell      # タイポを検出
+    - stylecheck    # Goらしいスタイルをチェック
+    - gocyclo       # 関数の循環的複雑度をチェック (高すぎると警告)
+    - unconvert     # 不要な型変換を検出
+    - bodyclose     # http.Response.Bodyなどの閉じ忘れを検出
+
+issues:
+  # 生成されたファイルやテストコード内の特定のエラーは無視します。
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck # テストコードではエラーを意図的に無視することがあるため
+

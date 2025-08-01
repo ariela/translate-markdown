@@ -1,0 +1,14 @@
+# .mise.toml
+# mise - [https://mise.jdx.dev/](https://mise.jdx.dev/)
+# このファイルは、プロジェクトで使用するツールのバージョンを定義します。
+
+[tools]
+go = "1.24"
+
+# [tasks] は、mise run <task_name> で実行できるコマンドを定義します。
+[tasks]
+fmt = "go fmt -s ./..."
+lint = "golangci-lint run"
+
+[env]
+DEEPL_AUTH_KEY = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx"

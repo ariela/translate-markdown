@@ -1,0 +1,70 @@
+# .goreleaser.yml
+# このファイルはGoReleaserの設定を定義します
+
+# プロジェクト名を指定
+project_name: translate-markdown
+
+# このファイルが古いバージョンのGoReleaserで実行されるのを防ぐ
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  # ビルド設定のリスト（今回は1つだけ）
+  -
+    # mainパッケージのパス
+    main: ./cmd/translate-markdown/
+    # CGOを無効にして、クロスコンパイルを容易にする
+    env:
+      - CGO_ENABLED=0
+    # ビルド対象のOSとアーキテクチャ
+    goos:
+      - linux
+      - windows
+      - darwin # macOS
+    goarch:
+      - amd64
+      - arm64
+    # バイナリを小さくするためのフラグ
+    ldflags:
+      - -s -w
+
+archives:
+  # ビルドしたバイナリをどのようにアーカイブ（圧縮）するかの設定
+  -
+    # アーカイブファイル名のテンプレート
+    # 例: translate-markdown_1.0.0_windows_amd64.zip
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}
+    # Windows向けにはzip、その他はtar.gzで圧縮
+    format_overrides:
+      - goos: windows
+        format: zip
+
+# リリース後の成果物のチェックサムを計算
+checksum:
+  name_template: 'checksums.txt'
+
+# スナップショット（開発版）リリースの設定
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+# CHANGELOGの自動生成設定
+changelog:
+  sort: asc
+  filters:
+    # feat, fix, refactorなどのコミットメッセージのみをCHANGELOGに含める
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+
+# GitHubリリースの設定
+release:
+  # GitHubリリースの設定
+  github:
+  # リポジトリのオーナーと名前（自動で検出されることが多い）
+  # owner: your-github-username
+  # name: translate-markdown
+  # ドラフトとしてリリースを作成するかどうか
+  draft: false
