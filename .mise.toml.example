@@ -6,9 +6,17 @@
 go = "1.24"
 
 # [tasks] は、mise run <task_name> で実行できるコマンドを定義します。
-[tasks]
-fmt = "go fmt -s ./..."
-lint = "golangci-lint run"
+[tasks.go_run]
+description = "ビルドせずに実行"
+run = "go run ./cmd/translate-markdown/main.go --config config.toml"
+
+[tasks.fmt]
+description = "コードフォーマット"
+run = "gofmt -l ./.."
+
+[tasks.lint]
+description = "静的解析"
+run = "golangci-lint run"
 
 [env]
 DEEPL_AUTH_KEY = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx"
