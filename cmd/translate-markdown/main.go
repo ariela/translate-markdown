@@ -27,8 +27,19 @@ var rootCmd = &cobra.Command{
 	Long: `translate-markdown is a command-line tool that translates Markdown files
 while preserving the structure, such as code blocks and frontmatter.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// プロジェクトルートとログファイルのパスを設定
+		projectRoot := filepath.Dir(configPath)
+		logFilePath := filepath.Join(projectRoot, "translate-errors.log")
+
+		// ログファイルを開く
+		logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		if err != nil {
+			log.Fatalf("Failed to open log file: %v", err)
+		}
+		defer logFile.Close()
+
 		// ロガーを初期化
-		logger := setupLogger()
+		logger := setupLogger(logFile)
 		slog.SetDefault(logger)
 
 		// 設定ファイルを読み込む
@@ -44,9 +55,6 @@ while preserving the structure, such as code blocks and frontmatter.`,
 			slog.Error("DEEPL_AUTH_KEY environment variable not set.")
 			os.Exit(1)
 		}
-
-		// プロジェクトルート（config.tomlがあるディレクトリ）を取得
-		projectRoot := filepath.Dir(configPath)
 
 		// DeepLクライアントと翻訳クライアントを初期化
 		deeplClient := deepl.NewClient(apiKey, logger)
@@ -77,17 +85,20 @@ while preserving the structure, such as code blocks and frontmatter.`,
 }
 
 // setupLoggerはデバッグモードに応じてロガーを設定します。
-func setupLogger() *slog.Logger {
+func setupLogger(logFile io.Writer) *slog.Logger {
 	logLevel := slog.LevelInfo
 	isDebug := os.Getenv("TRANSLATE_DEBUG") == "1"
 	if isDebug {
 		logLevel = slog.LevelDebug
 	}
 
+	// コンソールとログファイルの両方に出力
+	multiWriter := io.MultiWriter(os.Stderr, logFile)
+
 	opts := &slog.HandlerOptions{
 		Level: logLevel,
 	}
-	handler := slog.NewTextHandler(os.Stderr, opts)
+	handler := slog.NewTextHandler(multiWriter, opts)
 
 	// デバッグモードでない場合は、エラー発生時にのみログを出力するハンドラでラップ
 	if !isDebug {
@@ -108,6 +119,7 @@ func main() {
 	// slogを使うため、標準のlogの出力を無効化
 	log.SetOutput(io.Discard)
 	if err := rootCmd.Execute(); err != nil {
+		// cobraのエラーはslogで出力されないため、ここで明示的に出力
 		slog.Error("Command failed", "error", err)
 		os.Exit(1)
 	}
