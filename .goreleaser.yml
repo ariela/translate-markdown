@@ -1,5 +1,6 @@
 # .goreleaser.yml
 # このファイルはGoReleaserの設定を定義します
+version: 2
 
 # プロジェクト名を指定
 project_name: translate-markdown
@@ -39,7 +40,7 @@ archives:
     # Windows向けにはzip、その他はtar.gzで圧縮
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [ 'zip' ]
 
 # リリース後の成果物のチェックサムを計算
 checksum:
@@ -47,7 +48,7 @@ checksum:
 
 # スナップショット（開発版）リリースの設定
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ incpatch .Version }}-next"
 
 # CHANGELOGの自動生成設定
 changelog:
