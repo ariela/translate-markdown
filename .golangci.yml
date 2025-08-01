@@ -14,7 +14,8 @@ linters-settings:
     check-blank: true
   govet:
     # シャドーイングされた変数を検出します。
-    check-shadowing: true
+    enable:
+      - shadow
   gofmt:
     # gofmt -s と同じく、コードをシンプルにする提案をします。
     simplify: true
